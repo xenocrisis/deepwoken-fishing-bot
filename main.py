@@ -152,7 +152,7 @@ def main(debug=False):
         
 if __name__ == '__main__':
     from sys import argv
-    if argv[0] == 'debug':
+    if argv[1] == 'debug':
         debug = True
     else:
         debug = False
