@@ -78,7 +78,7 @@ def throw_rod():
 
     is_throwing_rod = False
 
-def hit_box(image, trigger_size=20, trigger_alture=45, lmargin=70, rmargin=38, middle_size=10, middle_offset=10,  fishing_trigger_alture=28):
+def hit_box(image, trigger_size=20, trigger_alture=45, lmargin=70, rmargin=38, middle_size=10, middle_offset=10,  fishing_trigger_alture=28, debug=False):
 
     global gray_scale_threshold
     global time_is_running
@@ -148,20 +148,15 @@ def hit_box(image, trigger_size=20, trigger_alture=45, lmargin=70, rmargin=38, m
         character['right'] = False
         character['middle'] = False
     else:
-        if left_is_mostly_white:
-            character['left'] = True
-        else:
-            character['left'] = False
 
-        if right_is_mostly_white:
-            character['right'] = True
-        else:
-            character['right'] = False
+        if left_is_mostly_white: character['left'] = True 
+        else: character['left'] = False
 
-        if middle_is_mostly_white:
-            character['middle'] = True
-        else:
-            character['middle'] = False
+        if right_is_mostly_white: character['right'] = True
+        else: character['right'] = False
+
+        if middle_is_mostly_white: character['middle'] = True
+        else: character['middle'] = False
     
     if character['left'] is True or character['right'] is True or character['middle'] is True:
         character['is_fishing'] = True
@@ -205,72 +200,63 @@ def hit_box(image, trigger_size=20, trigger_alture=45, lmargin=70, rmargin=38, m
     except:
         pass
 
-    print(character)
+    if debug:
+        print(character)
 
-    # Visual hitbox NOT LOGICAL:
-    image_visual = cv2.cvtColor(image.copy(), cv2.COLOR_BAYER_BG2BGR)
+        # Visual hitbox NOT LOGICAL:
+        image_visual = cv2.cvtColor(image.copy(), cv2.COLOR_BAYER_BG2BGR)
 
-    current_position = None
+        current_position = None
 
-    # Sensors view
-    if character['middle'] == True:
-        cv2.polylines(image_visual, [line_middle_coordinates.astype(np.int32)], isClosed=False, color=(0, 255, 0), thickness=2)
-        current_position = 'Middle'
-    else:
-        cv2.polylines(image_visual, [line_middle_coordinates.astype(np.int32)], isClosed=False, color=(255, 0, 0), thickness=2)
+        # Sensors view
+        if character['middle'] == True:
+            cv2.polylines(image_visual, [line_middle_coordinates.astype(np.int32)], isClosed=False, color=(0, 255, 0), thickness=2)
+            current_position = 'Middle'
+        else:
+            cv2.polylines(image_visual, [line_middle_coordinates.astype(np.int32)], isClosed=False, color=(255, 0, 0), thickness=2)
 
-    if character['left'] == True:
-        cv2.polylines(image_visual, [line_left_coordinates.astype(np.int32)], isClosed=False, color=(0, 255, 0), thickness=2)
-        current_position = 'Left'
-    else:
-        cv2.polylines(image_visual, [line_left_coordinates.astype(np.int32)], isClosed=False, color=(255, 0, 0), thickness=2)
+        if character['left'] == True:
+            cv2.polylines(image_visual, [line_left_coordinates.astype(np.int32)], isClosed=False, color=(0, 255, 0), thickness=2)
+            current_position = 'Left'
+        else:
+            cv2.polylines(image_visual, [line_left_coordinates.astype(np.int32)], isClosed=False, color=(255, 0, 0), thickness=2)
 
-    if character['right'] == True:
-        cv2.polylines(image_visual, [line_right_coordinates.astype(np.int32)], isClosed=False, color=(0, 255, 0), thickness=2)
-        current_position = 'Right'
-    else:
-        cv2.polylines(image_visual, [line_right_coordinates.astype(np.int32)], isClosed=False, color=(255, 0, 0), thickness=2)
+        if character['right'] == True:
+            cv2.polylines(image_visual, [line_right_coordinates.astype(np.int32)], isClosed=False, color=(0, 255, 0), thickness=2)
+            current_position = 'Right'
+        else:
+            cv2.polylines(image_visual, [line_right_coordinates.astype(np.int32)], isClosed=False, color=(255, 0, 0), thickness=2)
 
-    # Ui info
-    h, w = image_visual.shape[:2]
+        # Ui info
+        h, w = image_visual.shape[:2]
 
-    # Definir la región superior que se va a pintar de blanco
-    per_up = 0.2  # Porcentaje de la parte superior que se pintará
-    h_up = int(h * per_up)
+        # Definir la región superior que se va a pintar de blanco
+        per_up = 0.2  # Porcentaje de la parte superior que se pintará
+        h_up = int(h * per_up)
 
-    # Pintar la parte superior de blanco
-    image_visual[:h_up, :] = [0, 0, 0]  # [255, 255, 255] representa el color blanco en formato BGR
+        # Pintar la parte superior de blanco
+        image_visual[:h_up, :] = [0, 0, 0]  # [255, 255, 255] representa el color blanco en formato BGR
 
-    if character['toggle_fishing']:
-        fishing = "ON"
-    else:
-        fishing = "OFF"
+        if character['toggle_fishing']:
+            fishing = "ON"
+        else:
+            fishing = "OFF"
 
-    # Agregar texto encima
-    text = f'{fishing} | Not fishing for: {not_fishing_time} | Sensors Active: {character["sensors_active"]}'
-    position = (30, 50)  # Coordenadas (x, y) del texto en píxeles
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_size = 1
-    color_texto = (255, 255, 255)  # Color del texto en formato BGR
+        # Agregar texto encima
+        text = f'{fishing} | Not fishing for: {not_fishing_time} | Sensors Active: {character["sensors_active"]}'
+        position = (30, 50)  # Coordenadas (x, y) del texto en píxeles
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_size = 1
+        color_texto = (255, 255, 255)  # Color del texto en formato BGR
 
-    cv2.putText(image_visual, text, position, font, font_size, color_texto, 2, cv2.LINE_AA)
+        cv2.putText(image_visual, text, position, font, font_size, color_texto, 2, cv2.LINE_AA)
 
-    return image_visual
-
+        return image_visual
 
 def turn_to_black(image, contrast_factor=1.5, threshold=200):
-    # Leer la imagen
     image = np.array(image)
-
-    # Aplicar mejora de contraste
     image_contrast = cv2.convertScaleAbs(image, alpha=contrast_factor, beta=0)
-
-    # Convertir a escala de grises
     gray_scale_img = cv2.cvtColor(image_contrast, cv2.COLOR_BGR2GRAY)
-
     _, img_binary = cv2.threshold(gray_scale_img, threshold, 255, cv2.THRESH_BINARY)
-
-    # Filtro
-    img_binary = cv2.medianBlur(img_binary, 15)
-
+    img_binary = cv2.medianBlur(img_binary, 4)
     return img_binary
