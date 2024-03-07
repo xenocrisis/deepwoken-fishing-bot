@@ -30,7 +30,7 @@ def main(debug=False):
         window = gw.getWindowsWithTitle(window_title)
 
         if not window:
-            print(f"[LOG] Window with title '{window_title}' not found.")
+            # print(f"[LOG] Window with title '{window_title}' not found.")
             return
 
         window = window[0]
@@ -111,7 +111,7 @@ def main(debug=False):
         active_window = get_active_window()
 
         if active_window is None:
-            print(f'[LOG] No window found.')
+            # print(f'[LOG] No window found.')
             sleep(1)
             continue
         else:
@@ -124,25 +124,15 @@ def main(debug=False):
                 continue
 
             if active_window_title != 'Roblox':
-                print('[LOG] Roblox is not active. Current window:', active_window_title)
+                # print('[LOG] Roblox is not active. Current window:', active_window_title)
                 sleep(1)
                 continue
 
         # Roblox is open then:
 
-        os.system('cls' if os.name == 'nt' else 'clear')
-
         roblox_capture = capture_window(active_window_title)
-
         roblox_capture = resize_img(roblox_capture)
-        
-        window_width = active_window.width
-        window_height = active_window.height
-
-        if window_height <= 1000 and window_width <= 1000:
-            roblox_capture = hit_box(roblox_capture,lmargin=70, rmargin=38)
-        else:
-            roblox_capture = hit_box(roblox_capture,lmargin=53, rmargin=20)
+        roblox_capture = hit_box(roblox_capture, debug=debug)
 
         if debug:
             try:
@@ -152,8 +142,10 @@ def main(debug=False):
         
 if __name__ == '__main__':
     from sys import argv
-    if argv[1] == 'debug':
-        debug = True
+    for a in argv:
+        if a == 'debug':
+            debug = True
+            break
     else:
         debug = False
     try:
